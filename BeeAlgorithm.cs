@@ -54,16 +54,20 @@ namespace TestAlgoritmo{
 
         for (int i=0;i<num_abejas_ocupadas;i++){
           Abeja abeja = new Abeja();
-          //rnd_solution = RandomSolution();
-          RandomSolution();
-          //abeja.SetSolution(rnd_solution);
+          abeja.solucion = SolucionRandom();
+          abeja.ImprimirSolucion();
           abejas_ocupadas.Add(abeja);
         }
         return abejas_ocupadas;
       }
 
+      public double RelacionTareaOrden(int empleado, int puesto){
 
-      public Dictionary<int, double> CalcularProbabilidadesEleccion(int empleado, List<int> posibles_puestos){
+        double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
+        return relacion;
+      }
+
+      public Dictionary<int, double> CalcularProbabilidadesAsignacion(int empleado, List<int> posibles_puestos){
         /*
          * La probabilidad se calcula mediante la formula
          * pij = (bij/ai)/Sum(bij/ai)
@@ -78,7 +82,7 @@ namespace TestAlgoritmo{
          *
          */
         
-        Dictionary<int, double> prob_eleccion = new Dictionary<int, double>();
+        Dictionary<int, double> prob_asignacion = new Dictionary<int, double>();
 
         double total = 0;
         for (int i=0;i<posibles_puestos.Count;i++){
@@ -88,50 +92,76 @@ namespace TestAlgoritmo{
 
         for (int i=0;i<posibles_puestos.Count;i++){
           int puesto = posibles_puestos[i];
-          prob_eleccion[i] = RelacionTareaOrden(empleado, puesto)/total;
+          prob_asignacion[i] = RelacionTareaOrden(empleado, puesto)/total;
         }
 
-        // Checking...
-        //double sum =0;
-        //for (int i=0;i<posibles_puestos.Count;i++){
-        //  sum+= prob_eleccion[i];
-        //  Console.WriteLine("Prob {0},{1}: {2}", empleado, posibles_puestos[i], prob_eleccion[i]);
-        //}
-        //Console.WriteLine(sum);
-
-        return prob_eleccion;
+        return prob_asignacion;
       }
 
-      public double RelacionTareaOrden(int empleado, int puesto){
-
-        double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
-        return relacion;
-      }
-
-      public void RandomSolution(){
-        List<HashSet<int>> tareas_asignadas = new List<HashSet<int>>();
+      public List<List<int>> SolucionRandom(){
+        List<List<int>> empleados_asignados = new List<List<int>>();
         List<List<int>> posibles_puestos = new List<List<int>>();
+
+        for (int i=0;i<num_puestos;i++){
+          empleados_asignados.Add(new List<int>());
+        }
 
         //Initialize possible agents per task
         //All agents can be chosen at the beginning
-        for (int i=0;i<num_empleados;i++){
-          List<int> posibles_puestosxempleado = new List<int>();
+        for (int empleado=0;empleado<num_empleados;empleado++){
+          posibles_puestos.Add(new List<int>());
 
-          for (int j=0;j<num_puestos;j++){
-            posibles_puestosxempleado.Add(j);
+          for (int puesto=0;puesto<num_puestos;puesto++){
+            posibles_puestos[empleado].Add(puesto);
           }
-          posibles_puestos.Add(posibles_puestosxempleado);
         }
 
         //GRAH
-        for (int i=0;i<num_empleados;i++){
-          Dictionary<int, double> prob_eleccion = CalcularProbabilidadesEleccion(i, posibles_puestos[i]);
-        }
+        Random rand = new Random();
+        for (int empleado=0;;){
+          Dictionary<int, double> prob_asignacion = CalcularProbabilidadesAsignacion(empleado, posibles_puestos[empleado]);
 
+          double rnd = rand.NextDouble();
+          double cur_sum = 0;
+          int puesto_escogido = 0;
+          for (int j=0;j<posibles_puestos[empleado].Count;j++){
+            int puesto = posibles_puestos[empleado][j];
+            cur_sum += prob_asignacion[puesto];
+            if (cur_sum>rnd){
+              puesto_escogido = puesto;
+              break;
+            }
+          }
+
+          empleados_asignados[puesto_escogido].Add(empleado);
+
+          empleado++;
+          if (empleado<num_empleados){
+            int sum_tareas = 0;
+            for (int j=0;j<empleados_asignados[puesto_escogido].Count;j++){
+              int emp = empleados_asignados[puesto_escogido][j];
+              sum_tareas += tareas[emp, puesto_escogido];
+            }
+            if (sum_tareas > ordenes[puesto_escogido]){
+              for (int j=0;j<posibles_puestos.Count;j++){
+                posibles_puestos[j].Remove(puesto_escogido);
+              }
+            }
+          }else{
+            break;
+          }
+        }
+        return empleados_asignados;
       }
 
       public Abeja Asignacion(Test t1){
         List<Abeja> abejas_ocupadas = InicializarAbejasOcupadas();
+
+
+
+
+
+
         Console.WriteLine("Assign done");
         return abejas_ocupadas[0]; // Best abeja returned, 0 just for now
       }
