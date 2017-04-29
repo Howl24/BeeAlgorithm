@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AlgorithmTest{
 
@@ -47,15 +48,20 @@ namespace AlgorithmTest{
         return costs;
       }
 
-      public Bee Assign(Test t1){
-          Bee bee = new Bee();
-          //bee.Random_Assignment();
+      public List<Bee> InitializeEmployerBees(){
+        List<Bee> employer_bees = new List<Bee>();
 
-          Console.WriteLine("Assign done");
-          return bee;
+        for (int i=0;i<num_employer_bees;i++){
+          Bee bee = new Bee();
+          employer_bees.Add(bee);
+        }
+        return employer_bees;
       }
 
-
-
+      public Bee Assign(Test t1){
+        List<Bee> employer_bees = InitializeEmployerBees();
+        Console.WriteLine("Assign done");
+        return employer_bees[0]; // Best bee returned, 0 just for now
+      }
   }
 }

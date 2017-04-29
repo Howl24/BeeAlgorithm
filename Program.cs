@@ -9,7 +9,7 @@ namespace AlgorithmTest
             Test t1 = new Test();
             t1.ReadData("test1.txt");
 
-            BeeAlgorithm ba = new BeeAlgorithm(200, 50, 50, 1,3, t1);
+            BeeAlgorithm ba = new BeeAlgorithm(10, 5, 5, 1,3, t1);
             ba.Assign(t1);
             Console.Read();
         }
