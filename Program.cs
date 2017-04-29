@@ -8,11 +8,12 @@ namespace TestAlgoritmo
         {
             Test t1 = new Test();
             t1.LeerDatos("test1.txt");
+            Abeja.ConfigurarDatos(t1);
 
-            AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 5, 5, 1,3, t1);
-            ba.Asignacion(t1);
+
+            AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 5, 5, 1,3);
+            ba.Asignacion();
             Console.Read();
         }
-
     }
 }
