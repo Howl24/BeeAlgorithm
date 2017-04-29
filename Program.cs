@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace AlgorithmTest
+namespace TestAlgoritmo
 {
     class Program
     {
         public static void Main()
         {
             Test t1 = new Test();
-            t1.ReadData("test1.txt");
+            t1.LeerDatos("test1.txt");
 
-            BeeAlgorithm ba = new BeeAlgorithm(10, 5, 5, 1,3, t1);
-            ba.Assign(t1);
+            AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 5, 5, 1,3, t1);
+            ba.Asignacion(t1);
             Console.Read();
         }
 

@@ -2,24 +2,24 @@
 using System.IO;
 using System;
 
-namespace AlgorithmTest
+namespace TestAlgoritmo
 {
     class Test
     {
-        private int num_workers;
-        private int num_workplaces;
+        public int num_empleados;
+        public int num_puestos;
 
-        private int[, ] breaks;
-        private int[, ] tasks;
-        private int[] orders;
+        public int[, ] roturas;
+        public int[, ] tareas;
+        public int[] ordenesxpuesto;
 
         public Test()
         {
-            this.num_workers = 0;
-            this.num_workplaces = 0;
+            this.num_empleados = 0;
+            this.num_puestos = 0;
         }
 
-        public int[] ReadArray(StreamReader sr, int length)
+        public int[] LeerArreglo(StreamReader sr, int length)
         {
             var values = sr.ReadLine().Split();
             var array = new int[length];
@@ -30,7 +30,7 @@ namespace AlgorithmTest
             return array;
         }
 
-        public int[,] ReadMatrix(StreamReader sr, int rows, int columns)
+        public int[,] LeerMatriz(StreamReader sr, int rows, int columns)
         {
             int[,] matrix = new int[rows, columns];
             for (int i = 0; i < rows; i++)
@@ -44,24 +44,24 @@ namespace AlgorithmTest
             return matrix;
         }
 
-        public void ReadData(string filename)
+        public void LeerDatos(string filename)
         {
             StreamReader sr = new StreamReader(filename);
             var line = sr.ReadLine();
             var spl = line.Split();
 
-            num_workers = int.Parse(spl[0]);
-            num_workplaces = int.Parse(spl[1]);
+            num_empleados = int.Parse(spl[0]);
+            num_puestos = int.Parse(spl[1]);
 
-            breaks = ReadMatrix(sr, num_workers, num_workplaces);
-            tasks = ReadMatrix(sr, num_workers, num_workplaces);
-            orders = ReadArray(sr, num_workplaces);
+            roturas = LeerMatriz(sr, num_empleados, num_puestos);
+            tareas = LeerMatriz(sr, num_empleados, num_puestos);
+            ordenesxpuesto = LeerArreglo(sr, num_puestos);
 
             /*
-            for (int i = 0; i < num_workers; i++) {
-                for (int j=0;j<num_workplaces; j++)
+            for (int i = 0; i < num_empleados; i++) {
+                for (int j=0;j<num_puestos; j++)
                 {
-                    Console.Write(breaks[i,j]);
+                    Console.Write(roturas[i,j]);
                 }
                 Console.WriteLine();
             }
