@@ -10,20 +10,19 @@ namespace TestAlgoritmo{
       public int num_abejas_explo;
       public int max_iteraciones;
       public int coeficiente_penalidad;
-      public int tam_cadena_ejeccion;
       List<Abeja> abejas_ocupadas;
 
       public AlgoritmoAbejas(int num_abejas_ocupadas,
                              int num_abejas_espera,
+                             int num_abejas_explo,
                              int max_iteraciones,
-                             int coeficiente_penalidad,
-                             int tam_cadena_ejeccion){
+                             int coeficiente_penalidad){
 
           this.num_abejas_ocupadas = num_abejas_ocupadas;
           this.num_abejas_espera = num_abejas_espera;
+          this.num_abejas_explo = num_abejas_explo;
           this.max_iteraciones = max_iteraciones;
           this.coeficiente_penalidad = coeficiente_penalidad;
-          this.tam_cadena_ejeccion = tam_cadena_ejeccion;
       }
 
       public void InicializarAbejasOcupadas(){
@@ -95,8 +94,32 @@ namespace TestAlgoritmo{
 
 
       public void CompararConExploradoras(){
-        List<Abeja> lista_negra = new List<Abeja>();
+        List<int> lista_negra = new List<int>();
 
+        for (int i=0;i<num_abejas_explo;i++){
+          int peor_abeja = -1;
+          for (int j=0;j<abejas_ocupadas.Count;j++){
+            if (!lista_negra.Contains(j)){
+              if (peor_abeja == -1) peor_abeja = j;
+              if (abejas_ocupadas[j].fitness > abejas_ocupadas[peor_abeja].fitness){
+                peor_abeja = j;
+              }
+            }
+          }
+          lista_negra.Add(peor_abeja);
+        }
+
+        for (int i=0;i<lista_negra.Count;i++){
+          Abeja exploradora = new Abeja();
+          Abeja ocupada = abejas_ocupadas[lista_negra[i]];
+
+          exploradora.AsignacionRandom();
+          exploradora.CalcularFitness();
+          if (exploradora.fitness < ocupada.fitness){
+            ocupada.AsignarSolucion(exploradora.empleados_asignados);
+            ocupada.fitness = exploradora.fitness;
+          }
+        }
       }
 
       public Abeja Asignacion(){
