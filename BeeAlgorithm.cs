@@ -11,13 +11,7 @@ namespace TestAlgoritmo{
       public int max_iteraciones;
       public int coeficiente_penalidad;
       public int tam_cadena_ejeccion;
-
-      public int num_puestos;
-      public int num_empleados;
-
-      public int[] ordenes; //ordenes por puesto
-      public int[, ] tareas; // tareas realizadas por un empleado en un puesto [empleado, puesto]
-      public int[, ] costo_asignacion; //[task, agent]
+      List<Abeja> abejas_ocupadas;
 
       public AlgoritmoAbejas(int num_abejas_ocupadas,
                              int num_abejas_espera,
@@ -32,25 +26,96 @@ namespace TestAlgoritmo{
           this.tam_cadena_ejeccion = tam_cadena_ejeccion;
       }
 
-      public List<Abeja> InicializarAbejasOcupadas(){
-        List<Abeja> abejas_ocupadas = new List<Abeja>();
+      public void InicializarAbejasOcupadas(){
+        abejas_ocupadas = new List<Abeja>();
 
         for (int i=0;i<num_abejas_ocupadas;i++){
           Abeja abeja = new Abeja();
           abeja.AsignacionRandom();
+          abeja.CalcularFitness();
           abeja.ImprimirSolucion();
-          abeja.Fitness(coeficiente_penalidad);
 
           abejas_ocupadas.Add(abeja);
         }
 
-        return abejas_ocupadas;
+      }
+
+      public Dictionary<int, double> CalcularProbabilidadesEspera(){
+        Dictionary<int, double> prob_espera = new Dictionary<int, double>();
+
+        double total = 0;
+        for (int i=0;i<abejas_ocupadas.Count;i++){
+          double fitness = abejas_ocupadas[i].fitness;
+          total += 1/fitness;
+        }
+
+        for (int i=0;i<abejas_ocupadas.Count;i++){
+          double fitness = abejas_ocupadas[i].fitness;
+          prob_espera[i] = (1/fitness)/total;
+          //Console.WriteLine("Fitness: {0}, Prob: {1}", fitness, prob_espera[i]);
+        }
+        return prob_espera;
+      }
+
+      public void CompararConEspera(Dictionary<int, double> prob_espera){
+        //Asignacion de abejas en espera
+        int[] cnt_espera = new int[abejas_ocupadas.Count];
+        Random rand = new Random();
+        for (int i=0;i<num_abejas_espera;i++){
+          double rnd = rand.NextDouble();
+          double cur_sum = 0;
+          int abeja_escogida = 0;
+          for (int j=0;j<abejas_ocupadas.Count;j++){
+            cur_sum += prob_espera[j];
+            if (cur_sum >= rnd){
+              abeja_escogida = j;
+              break;
+            }
+          }
+          cnt_espera[abeja_escogida]++;
+        }
+
+        for (int i=0;i<abejas_ocupadas.Count;i++){
+          for (int j=0;j<cnt_espera[i];j++){
+            abejas_ocupadas[i].CompararConVecino();
+          }
+        }
+
+      }
+
+      public Abeja MejorAbeja(){
+        Abeja mejor_abeja = abejas_ocupadas[0];
+        for (int i=0;i<abejas_ocupadas.Count;i++){
+          if (abejas_ocupadas[i].fitness < mejor_abeja.fitness){
+            mejor_abeja = abejas_ocupadas[i];
+          }
+        }
+        return mejor_abeja;
+      }
+
+
+      public void CompararConExploradoras(){
+        List<Abeja> lista_negra = new List<Abeja>();
+
       }
 
       public Abeja Asignacion(){
-        List<Abeja> abejas_ocupadas = InicializarAbejasOcupadas();
-        Console.WriteLine("Assign done");
-        return abejas_ocupadas[0]; // Best abeja returned, 0 just for now
+        InicializarAbejasOcupadas();
+        Abeja mejor_abeja = new Abeja();
+
+        for (int i=0;i<max_iteraciones;i++){
+          for (int j=0;j<abejas_ocupadas.Count;j++){
+            abejas_ocupadas[j].CompararConVecino();
+            Dictionary<int, double> prob_espera = CalcularProbabilidadesEspera();
+            CompararConEspera(prob_espera);
+
+          }
+          mejor_abeja = MejorAbeja();
+
+          CompararConExploradoras();
+        }
+        mejor_abeja.ImprimirSolucion();
+        return mejor_abeja;
       }
   }
 }

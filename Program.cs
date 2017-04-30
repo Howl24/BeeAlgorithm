@@ -11,9 +11,8 @@ namespace TestAlgoritmo
             Abeja.ConfigurarDatos(t1);
 
 
-            AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 5, 5, 1,3);
+            AlgoritmoAbejas ba = new AlgoritmoAbejas(3, 100, 1, 1,3);
             ba.Asignacion();
-            Console.Read();
         }
     }
 }

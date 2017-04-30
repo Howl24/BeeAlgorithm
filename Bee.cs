@@ -16,11 +16,12 @@ namespace TestAlgoritmo
     public static int[] ordenes;// [puestos]
     public static double[, ] tareas; //[empleados, puestos]
     public static double[, ] costo_asignacion; // [empleados, puestos]
+    public static int coeficiente_penalidad = 1;
 
     public List<List<int>> empleados_asignados; // [puestos, empleados]
+    public double fitness;
 
     public Abeja(){
-      Console.WriteLine("Abeja created");
     }
 
     public static double[, ] CalcularCostos(double[, ] tareas, double[, ] roturas){
@@ -32,6 +33,18 @@ namespace TestAlgoritmo
       }
       return costos;
     }
+
+    public void AsignarSolucion(List<List<int>> sol){
+      empleados_asignados = new List<List<int>>();
+      for (int i=0;i<sol.Count;i++){
+        empleados_asignados.Add(new List<int>());
+        for (int j=0;j<sol[i].Count;j++){
+          int empleado = sol[i][j];
+          empleados_asignados[i].Add(empleado);
+        }
+      }
+    }
+
 
     public static void ConfigurarDatos(Test test){
       Abeja.num_puestos = test.num_puestos;
@@ -145,20 +158,23 @@ namespace TestAlgoritmo
         }
         Console.WriteLine();
       }
+      Console.WriteLine("Fitness: {0}", fitness);
+      Console.WriteLine();
     }
 
+    public void CalcularFitness(){
+      fitness = Fitness(empleados_asignados);
+    }
 
-    public double Fitness(int coeficiente_penalidad){
+    public double Fitness(List<List<int>> empleados_asignados){
       double fitness = 0;
 
       for (int puesto =0;puesto<empleados_asignados.Count;puesto++){
         for (int j=0;j<empleados_asignados[puesto].Count;j++){
           int empleado = empleados_asignados[puesto][j];
-          Console.WriteLine("Costo: {0} ", costo_asignacion[empleado, puesto]);
           fitness += costo_asignacion[empleado, puesto];
         }
       }
-      Console.WriteLine("Simple Fitness: {0}", fitness);
 
       double penalidad = 0;
       for (int puesto=0;puesto<empleados_asignados.Count;puesto++){
@@ -171,10 +187,65 @@ namespace TestAlgoritmo
         penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
         penalidad *= coeficiente_penalidad;
       }
-      Console.WriteLine("Penalidad: {0}", penalidad);
       fitness += penalidad;
 
       return fitness;
+    }
+
+    public Abeja Vecino(){
+      Random rand = new Random();
+
+      Abeja vecino = new Abeja();
+      vecino.AsignarSolucion(empleados_asignados);
+
+      int puesto = -1;
+      while(puesto==-1){
+        puesto = rand.Next(0, vecino.empleados_asignados.Count);
+        if (vecino.empleados_asignados[puesto].Count == 0){
+          puesto = -1;
+        }
+      }
+      int rnd = rand.Next(0, vecino.empleados_asignados[puesto].Count);
+      int empleado = vecino.empleados_asignados[puesto][rnd];
+
+      vecino.empleados_asignados[puesto].Remove(empleado);
+
+      int puesto_escogido = puesto;
+      double min_costo = 10000;
+      for (int nuevo_puesto=0;nuevo_puesto<vecino.empleados_asignados.Count;nuevo_puesto++){
+        if (nuevo_puesto!=puesto){
+          double nuevo_costo = costo_asignacion[empleado, nuevo_puesto];
+
+          double penalidad = 0;
+          double sum_tareas = 0;
+          for (int i=0;i<vecino.empleados_asignados[nuevo_puesto].Count;i++){
+            int emp = vecino.empleados_asignados[nuevo_puesto][i];
+            sum_tareas += tareas[emp, nuevo_puesto];
+          }
+          sum_tareas += tareas[empleado, nuevo_puesto];
+          penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
+          penalidad *= coeficiente_penalidad;
+          nuevo_costo += penalidad;
+
+          if (min_costo > nuevo_costo){
+            min_costo = nuevo_costo;
+            puesto_escogido = nuevo_puesto;
+          }
+        }
+      }
+
+      vecino.empleados_asignados[puesto_escogido].Add(empleado);
+      vecino.CalcularFitness();
+      return vecino;
+    }
+
+
+    public void CompararConVecino(){
+      Abeja vecino = Vecino();
+      if (vecino.fitness < this.fitness){
+        this.AsignarSolucion(vecino.empleados_asignados);
+        this.fitness = vecino.fitness;
+      }
     }
 
   }
