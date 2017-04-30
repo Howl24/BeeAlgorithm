@@ -16,7 +16,7 @@ namespace TestAlgoritmo
     public static int[] ordenes;// [puestos]
     public static double[, ] tareas; //[empleados, puestos]
     public static double[, ] costo_asignacion; // [empleados, puestos]
-    public static int coeficiente_penalidad = 1;
+    public static double coeficiente_penalidad = 0.8;
 
     public List<List<int>> empleados_asignados; // [puestos, empleados]
     public double fitness;
@@ -150,8 +150,16 @@ namespace TestAlgoritmo
     }
 
     public void ImprimirSolucion(){
+
       for (int i=0;i<empleados_asignados.Count;i++){
-        Console.WriteLine("Puesto: {0}", i);
+        double sum_tareas = 0;
+        for (int j=0;j<empleados_asignados[i].Count;j++){
+          int emp = empleados_asignados[i][j];
+          sum_tareas += tareas[emp, i];
+        }
+        double falta = Math.Max(0,ordenes[i] - sum_tareas);
+
+        Console.WriteLine("Puesto: {0} Falta: {1}", i, falta);
         Console.Write(" Empleados: ");
         for (int j=0;j<empleados_asignados[i].Count;j++){
           Console.Write("{0} ", empleados_asignados[i][j]);
@@ -238,7 +246,6 @@ namespace TestAlgoritmo
       vecino.CalcularFitness();
       return vecino;
     }
-
 
     public void CompararConVecino(){
       Abeja vecino = Vecino();
