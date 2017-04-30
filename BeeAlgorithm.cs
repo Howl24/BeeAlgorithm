@@ -39,14 +39,16 @@ namespace TestAlgoritmo{
           Abeja abeja = new Abeja();
           abeja.AsignacionRandom();
           abeja.ImprimirSolucion();
+          abeja.Fitness(coeficiente_penalidad);
+
           abejas_ocupadas.Add(abeja);
         }
+
         return abejas_ocupadas;
       }
 
       public Abeja Asignacion(){
         List<Abeja> abejas_ocupadas = InicializarAbejasOcupadas();
-
         Console.WriteLine("Assign done");
         return abejas_ocupadas[0]; // Best abeja returned, 0 just for now
       }

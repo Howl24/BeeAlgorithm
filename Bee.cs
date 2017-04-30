@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//Falta divisiones entre 0
+
 namespace TestAlgoritmo
 {
   class Abeja
@@ -11,18 +13,18 @@ namespace TestAlgoritmo
 
     public static int num_puestos;
     public static int num_empleados;
-    public static int[] ordenes;
-    public static int[, ] tareas;
-    public static int[, ] costo_asignacion;
+    public static int[] ordenes;// [puestos]
+    public static double[, ] tareas; //[empleados, puestos]
+    public static double[, ] costo_asignacion; // [empleados, puestos]
 
-    public List<List<int>> empleados_asignados;
+    public List<List<int>> empleados_asignados; // [puestos, empleados]
 
     public Abeja(){
       Console.WriteLine("Abeja created");
     }
 
-    public static int[, ] CalcularCostos(int[, ] tareas, int[, ] roturas){
-      int[, ] costos = new int[num_empleados, num_puestos];
+    public static double[, ] CalcularCostos(double[, ] tareas, double[, ] roturas){
+      double[, ] costos = new double[num_empleados, num_puestos];
       for (int i=0;i<num_empleados;i++){
         for (int j=0;j<num_puestos;j++){
           costos[i, j] = (1+roturas[i, j])/(1+tareas[i, j]);
@@ -70,7 +72,7 @@ namespace TestAlgoritmo
 
       for (int i=0;i<posibles_puestos.Count;i++){
         int puesto = posibles_puestos[i];
-        prob_asignacion[i] = RelacionTareaOrden(empleado, puesto)/total;
+        prob_asignacion[puesto] = RelacionTareaOrden(empleado, puesto)/total;
       }
 
       return prob_asignacion;
@@ -108,10 +110,9 @@ namespace TestAlgoritmo
         for (int j=0;j<posibles_puestos[empleado].Count;j++){
           int puesto = posibles_puestos[empleado][j];
           cur_sum += prob_asignacion[puesto];
-          if (cur_sum>rnd){
+          if (cur_sum>=rnd){
             puesto_escogido = puesto;
             break;
-
           }
         }
 
@@ -119,7 +120,7 @@ namespace TestAlgoritmo
 
         empleado++;
         if (empleado<num_empleados){
-          int sum_tareas = 0;
+          double sum_tareas = 0;
           for (int j=0;j<empleados_asignados[puesto_escogido].Count;j++){
             int emp = empleados_asignados[puesto_escogido][j];
             sum_tareas += tareas[emp, puesto_escogido];
@@ -144,6 +145,36 @@ namespace TestAlgoritmo
         }
         Console.WriteLine();
       }
+    }
+
+
+    public double Fitness(int coeficiente_penalidad){
+      double fitness = 0;
+
+      for (int puesto =0;puesto<empleados_asignados.Count;puesto++){
+        for (int j=0;j<empleados_asignados[puesto].Count;j++){
+          int empleado = empleados_asignados[puesto][j];
+          Console.WriteLine("Costo: {0} ", costo_asignacion[empleado, puesto]);
+          fitness += costo_asignacion[empleado, puesto];
+        }
+      }
+      Console.WriteLine("Simple Fitness: {0}", fitness);
+
+      double penalidad = 0;
+      for (int puesto=0;puesto<empleados_asignados.Count;puesto++){
+        double sum_tareas = 0;
+        for (int j=0;j<empleados_asignados[puesto].Count;j++){
+          int empleado = empleados_asignados[puesto][j];
+          sum_tareas += tareas[empleado, puesto];
+        }
+
+        penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
+        penalidad *= coeficiente_penalidad;
+      }
+      Console.WriteLine("Penalidad: {0}", penalidad);
+      fitness += penalidad;
+
+      return fitness;
     }
 
   }
