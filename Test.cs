@@ -9,8 +9,8 @@ namespace TestAlgoritmo
         public int num_empleados;
         public int num_puestos;
 
-        public int[, ] roturas;
-        public int[, ] tareas;
+        public double[, ] roturas;
+        public double[, ] tareas;
         public int[] ordenesxpuesto;
 
         public Test()
@@ -30,15 +30,15 @@ namespace TestAlgoritmo
             return array;
         }
 
-        public int[,] LeerMatriz(StreamReader sr, int rows, int columns)
+        public double[,] LeerMatriz(StreamReader sr, int rows, int columns)
         {
-            int[,] matrix = new int[rows, columns];
+            double[,] matrix = new double[rows, columns];
             for (int i = 0; i < rows; i++)
             {
                 var values = sr.ReadLine().Split();
                 for (int j = 0; j < columns; j++)
                 {
-                    matrix[i, j] = int.Parse(values[j]);
+                    matrix[i, j] = double.Parse(values[j]);
                 }
             }
             return matrix;
@@ -57,15 +57,6 @@ namespace TestAlgoritmo
             tareas = LeerMatriz(sr, num_empleados, num_puestos);
             ordenesxpuesto = LeerArreglo(sr, num_puestos);
 
-            /*
-            for (int i = 0; i < num_empleados; i++) {
-                for (int j=0;j<num_puestos; j++)
-                {
-                    Console.Write(roturas[i,j]);
-                }
-                Console.WriteLine();
-            }
-            */
         }
 
     }
