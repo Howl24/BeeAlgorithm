@@ -16,10 +16,11 @@ namespace TestAlgoritmo
     public static int[] ordenes;// [puestos]
     public static double[, ] tareas; //[empleados, puestos]
     public static double[, ] costo_asignacion; // [empleados, puestos]
-    public static double coeficiente_penalidad = 0.8;
+    public static double coeficiente_penalidad = 0.9;
 
     public List<List<int>> empleados_asignados; // [puestos, empleados]
     public double fitness;
+    public static Random rand = new Random();
 
     public Abeja(){
     }
@@ -28,7 +29,7 @@ namespace TestAlgoritmo
       double[, ] costos = new double[num_empleados, num_puestos];
       for (int i=0;i<num_empleados;i++){
         for (int j=0;j<num_puestos;j++){
-          costos[i, j] = (1+roturas[i, j])/(1+tareas[i, j]);
+          costos[i, j] = (1+roturas[i, j]);
         }
       }
       return costos;
@@ -54,6 +55,7 @@ namespace TestAlgoritmo
       Abeja.costo_asignacion = CalcularCostos(test.tareas, test.roturas);
     }
 
+    //Suceptible a Pedido, revisar test
     public double RelacionTareaOrden(int empleado, int puesto){
 
       double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
@@ -80,7 +82,7 @@ namespace TestAlgoritmo
       double total = 0;
       for (int i=0;i<posibles_puestos.Count;i++){
         int puesto = posibles_puestos[i];
-        total += RelacionTareaOrden(empleado, puesto);
+        total += RelacionTareaOrden(empleado, puesto); 
       }
 
       for (int i=0;i<posibles_puestos.Count;i++){
@@ -92,6 +94,18 @@ namespace TestAlgoritmo
     }
 
 
+    public void AsignacionSuperRandom(){
+      empleados_asignados = new List<List<int>>();
+
+      for (int i=0;i<num_puestos;i++){
+        empleados_asignados.Add(new List<int>());
+      }
+
+      for (int i=0;i<num_empleados;i++){
+        int rnd = rand.Next(0, num_puestos);
+        empleados_asignados[rnd].Add(i);
+      }
+    }
 
     public void AsignacionRandom(){
       empleados_asignados = new List<List<int>>();
@@ -113,7 +127,6 @@ namespace TestAlgoritmo
 
 
       //GRAH
-      Random rand = new Random();
       for (int empleado=0;;){
         Dictionary<int, double> prob_asignacion = CalcularProbabilidadesAsignacion(empleado, posibles_puestos[empleado]);
 
@@ -165,6 +178,7 @@ namespace TestAlgoritmo
           Console.Write("{0} ", empleados_asignados[i][j]);
         }
         Console.WriteLine();
+        Console.WriteLine();
       }
       Console.WriteLine("Fitness: {0}", fitness);
       Console.WriteLine();
@@ -201,7 +215,6 @@ namespace TestAlgoritmo
     }
 
     public Abeja Vecino(){
-      Random rand = new Random();
 
       Abeja vecino = new Abeja();
       vecino.AsignarSolucion(empleados_asignados);

@@ -20,8 +20,7 @@ namespace TestAlgoritmo{
 
           this.num_abejas_ocupadas = num_abejas_ocupadas;
           this.num_abejas_espera = num_abejas_espera;
-          this.num_abejas_explo = num_abejas_explo;
-          this.max_iteraciones = max_iteraciones;
+          this.num_abejas_explo = num_abejas_explo; this.max_iteraciones = max_iteraciones;
           this.coeficiente_penalidad = coeficiente_penalidad;
       }
 
@@ -30,9 +29,10 @@ namespace TestAlgoritmo{
 
         for (int i=0;i<num_abejas_ocupadas;i++){
           Abeja abeja = new Abeja();
-          abeja.AsignacionRandom();
+          abeja.AsignacionSuperRandom();
           abeja.CalcularFitness();
-          abeja.ImprimirSolucion();
+          Console.WriteLine(abeja.fitness);
+          //abeja.ImprimirSolucion();
 
           abejas_ocupadas.Add(abeja);
         }
@@ -110,14 +110,19 @@ namespace TestAlgoritmo{
         }
 
         for (int i=0;i<lista_negra.Count;i++){
-          Abeja exploradora = new Abeja();
           Abeja ocupada = abejas_ocupadas[lista_negra[i]];
 
-          exploradora.AsignacionRandom();
+          Abeja exploradora = new Abeja();
+          exploradora.AsignacionSuperRandom();
           exploradora.CalcularFitness();
+          Console.WriteLine(exploradora.fitness);
+
           if (exploradora.fitness < ocupada.fitness){
+            Console.WriteLine("OHHHH EXPLORADORA IS SO GOOD");
             ocupada.AsignarSolucion(exploradora.empleados_asignados);
             ocupada.fitness = exploradora.fitness;
+          }else{
+            exploradora = null;
           }
         }
       }
@@ -127,16 +132,21 @@ namespace TestAlgoritmo{
         Abeja mejor_abeja = new Abeja();
 
         for (int i=0;i<max_iteraciones;i++){
+          Console.WriteLine("Iteracion {0}:", i+1);
           for (int j=0;j<abejas_ocupadas.Count;j++){
-            abejas_ocupadas[j].CompararConVecino();
+            //Console.WriteLine("Fit {0}:", abejas_ocupadas[j].fitness);
+            //abejas_ocupadas[j].CompararConVecino();
             Dictionary<int, double> prob_espera = CalcularProbabilidadesEspera();
             CompararConEspera(prob_espera);
 
           }
           mejor_abeja = MejorAbeja();
+          //mejor_abeja.ImprimirSolucion();
+          Console.WriteLine("Mejor Fitness: {0}", mejor_abeja.fitness);
 
           CompararConExploradoras();
         }
+        Console.WriteLine("Mejor Solucion:");
         mejor_abeja.ImprimirSolucion();
         return mejor_abeja;
       }
