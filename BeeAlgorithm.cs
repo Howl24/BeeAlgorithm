@@ -158,7 +158,7 @@ namespace TestAlgoritmo{
           CompararConExploradoras();
         }
         Console.WriteLine("Mejor Solucion: {0}", mejor_abeja.fitness);
-        //mejor_abeja.ImprimirSolucion();
+        mejor_abeja.ImprimirSolucion();
         return mejor_abeja;
       }
   }
