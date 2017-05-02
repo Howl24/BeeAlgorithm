@@ -18,7 +18,7 @@ namespace TestAlgoritmo
                 Abeja.rand = rand;
                 AlgoritmoAbejas.rand = rand;
 
-                AlgoritmoAbejas ba = new AlgoritmoAbejas(40, 100, 15, 30);
+                AlgoritmoAbejas ba = new AlgoritmoAbejas(40, 100, 5, 50);
                 ba.Asignacion();
                 return ;
             }
