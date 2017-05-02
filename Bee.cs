@@ -261,6 +261,7 @@ namespace TestAlgoritmo
         }
       }
 
+      vecino.empleados_asignados[puesto_escogido].Add(empleado);
       vecino.CadenaDeReemplazos(puesto);
 
       //int p1 = vecino.Reemplazo(puesto);
@@ -278,7 +279,6 @@ namespace TestAlgoritmo
       //}
 
 
-      vecino.empleados_asignados[puesto_escogido].Add(empleado);
       vecino.CalcularFitness();
       return vecino;
     }
@@ -307,6 +307,14 @@ namespace TestAlgoritmo
           }
         }
       }
+
+
+
+
+
+
+
+
 
     }
 
@@ -339,6 +347,11 @@ namespace TestAlgoritmo
         }
       }
 
+      if (doble_shift){
+        vecino.Reemplazo(puesto);
+      }
+
+
       vecino.empleados_asignados[puesto_escogido].Add(empleado);
       vecino.CalcularFitness();
       return vecino;
@@ -356,15 +369,24 @@ namespace TestAlgoritmo
 
         for (int i=0;i<empleados_asignados.Count;i++){
           if (i!= puesto){
-            if (CantidadAsignada(i) > ordenes[i]){
-              for (int j=0;j<empleados_asignados[i].Count;j++){
-                int emp = empleados_asignados[i][j];
-                double costo = falta_puesto - tareas[emp, puesto] + costo_asignacion[emp, puesto];
-                if (min_costo > costo){
-                  min_costo = costo;
-                  nuevo_emp = emp;
-                  puesto_nuevo_emp = i;
-                }
+            for (int j=0;j<empleados_asignados[i].Count;j++){
+              int emp = empleados_asignados[i][j];
+              double nuevo_falta = 0;
+
+              if (CantidadAsignada(i) > ordenes[i]){
+                  empleados_asignados[i].Remove(emp);
+                  nuevo_falta = ordenes[i] - CantidadAsignada(i);
+                  empleados_asignados[i].Add(emp);
+              }else{
+                  nuevo_falta = tareas[emp, i];
+              }
+
+
+              double costo = falta_puesto - tareas[emp, puesto] + costo_asignacion[emp, puesto] + nuevo_falta - costo_asignacion[emp, i];
+              if (min_costo >= costo){
+                min_costo = costo;
+                nuevo_emp = emp;
+                puesto_nuevo_emp = i;
               }
             }
           }
@@ -397,8 +419,6 @@ namespace TestAlgoritmo
         }
       }
     }
-
-
 
   }
 }

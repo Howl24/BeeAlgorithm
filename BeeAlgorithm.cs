@@ -114,11 +114,18 @@ namespace TestAlgoritmo{
           Abeja exploradora = new Abeja();
           exploradora.AsignacionSuperRandom();
           exploradora.CalcularFitness();
+          Console.WriteLine("Ex1: {0}", exploradora.fitness);
           exploradora.CompararConVecindario(false);
-          //Console.WriteLine(exploradora.fitness);
+          Console.WriteLine("Ex2: {0}", exploradora.fitness);
 
-          if (exploradora.fitness < ocupada.fitness){
-            //Console.WriteLine("La exploradora encontro algo xD");
+          for (int j=0;j<10;j++){
+            exploradora.CompararConVecino();
+          }
+
+          Console.WriteLine("Ex3: {0}", exploradora.fitness);
+
+          if (exploradora.fitness - ocupada.fitness < 4){
+            Console.WriteLine("La exploradora encontro algo xD");
             ocupada.AsignarSolucion(exploradora.empleados_asignados);
             ocupada.fitness = exploradora.fitness;
           }else{
@@ -132,10 +139,11 @@ namespace TestAlgoritmo{
         Abeja mejor_abeja = new Abeja();
 
         for (int i=0;i<max_iteraciones;i++){
-          //Console.WriteLine("Iteracion {0}:", i+1);
+          Console.WriteLine("Iteracion {0}:", i+1);
           for (int j=0;j<abejas_ocupadas.Count;j++){
-            //Console.WriteLine("Fit {0}:", abejas_ocupadas[j].fitness);
+            Console.WriteLine("Fit {0}:", abejas_ocupadas[j].fitness);
             abejas_ocupadas[j].CompararConVecindario(false);
+            abejas_ocupadas[j].CompararConVecindario(true);
             Dictionary<int, double> prob_espera = CalcularProbabilidadesEspera();
             CompararConEspera(prob_espera);
 

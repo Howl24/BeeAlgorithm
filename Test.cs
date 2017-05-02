@@ -53,9 +53,9 @@ namespace TestAlgoritmo
             num_empleados = int.Parse(spl[0]);
             num_puestos = int.Parse(spl[1]);
 
-            roturas = LeerMatriz(sr, num_empleados, num_puestos);
-            tareas = LeerMatriz(sr, num_empleados, num_puestos);
             ordenesxpuesto = LeerArreglo(sr, num_puestos);
+            tareas = LeerMatriz(sr, num_empleados, num_puestos);
+            roturas = LeerMatriz(sr, num_empleados, num_puestos);
 
         }
 
