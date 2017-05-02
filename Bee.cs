@@ -184,7 +184,6 @@ namespace TestAlgoritmo
           Console.Write("{0} ", empleados_asignados[i][j]);
         }
         Console.WriteLine();
-        Console.WriteLine();
       }
       Console.WriteLine("Fitness: {0}", fitness);
       Console.WriteLine();
