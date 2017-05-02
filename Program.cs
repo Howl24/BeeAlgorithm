@@ -14,11 +14,11 @@ namespace TestAlgoritmo
 
                 Random rand = new Random();
 
-                Abeja.ConfigurarDatos(t1,5);
+                Abeja.ConfigurarDatos(t1,3);
                 Abeja.rand = rand;
                 AlgoritmoAbejas.rand = rand;
 
-                AlgoritmoAbejas ba = new AlgoritmoAbejas(40, 100, 5, 30);
+                AlgoritmoAbejas ba = new AlgoritmoAbejas(25, 100, 5, 20);
                 ba.Asignacion();
                 return ;
             }

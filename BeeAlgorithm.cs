@@ -121,7 +121,7 @@ namespace TestAlgoritmo{
           exploradora.CalcularFitness();
           exploradora.CompararConVecindario(false);
 
-          for (int j=0;j<10;j++){
+          for (int j=0;j<5;j++){
             exploradora.CompararConVecino();
           }
 
@@ -147,7 +147,6 @@ namespace TestAlgoritmo{
           for (int j=0;j<abejas_ocupadas.Count;j++){
             //Console.WriteLine("Fit {0}:", abejas_ocupadas[j].fitness);
             abejas_ocupadas[j].CompararConVecindario(false);
-            abejas_ocupadas[j].CompararConVecindario(true);
             Dictionary<int, double> prob_espera = CalcularProbabilidadesEspera();
             CompararConEspera(prob_espera);
 
