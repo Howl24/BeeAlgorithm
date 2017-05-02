@@ -152,16 +152,6 @@ namespace TestAlgoritmo
 
         empleado++;
         if (empleado<num_empleados){
-          double sum_tareas = 0;
-          for (int j=0;j<empleados_asignados[puesto_escogido].Count;j++){
-            int emp = empleados_asignados[puesto_escogido][j];
-            sum_tareas += tareas[emp, puesto_escogido];
-          }
-          if (sum_tareas > ordenes[puesto_escogido]){
-            for (int j=0;j<posibles_puestos.Count;j++){
-              posibles_puestos[j].Remove(puesto_escogido);
-            }
-          }
         }else{
           break;
         }
@@ -263,21 +253,6 @@ namespace TestAlgoritmo
       vecino.empleados_asignados[puesto_escogido].Add(empleado);
       vecino.CadenaDeReemplazos(puesto);
 
-      //int p1 = vecino.Reemplazo(puesto);
-      //if (p1 != -1){
-      //  int p2 = vecino.Reemplazo(p1);
-      //  if (p2 != -1){
-      //    int p3 = vecino.Reemplazo(p2);
-      //    if (p3 != -1){
-      //      int p4 = vecino.Reemplazo(p3);
-      //      if (p4 != -1){
-      //        int p4 = vecino.Reemplazo(p4);
-      //      }
-      //    }
-      //  }
-      //}
-
-
       vecino.CalcularFitness();
       return vecino;
     }
@@ -306,14 +281,6 @@ namespace TestAlgoritmo
           }
         }
       }
-
-
-
-
-
-
-
-
 
     }
 
