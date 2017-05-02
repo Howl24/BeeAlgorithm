@@ -7,26 +7,26 @@ namespace TestAlgoritmo
     {
         public static void Main()
         {
-            //Random rand = new Random();
-            //List<int> rnds = new List<int>();
-            //for (int i=0;i<100;i++){
-            //  int rnd = rand.Next(0, 100);
-            //  rnds.Add(rnd);
-            //}
-
-            //for (int i=0;i<100;i++){
-            //  Console.WriteLine(rnds[i]);
-            //}
-
-
-
-
+          double prom = 0;
+          int iter = 20;
+          for (int i=0;i<iter;i++){
+            Console.WriteLine("Test: {0}", i);
             Test t1 = new Test();
-            t1.LeerDatos("CR400T10P.txt");
-            Abeja.ConfigurarDatos(t1);
+            t1.LeerDatos("CR100T10P.txt");
 
-            AlgoritmoAbejas ba = new AlgoritmoAbejas(30, 100, 5, 70, 1);
-            ba.Asignacion();
+            Random rand = new Random();
+
+            Abeja.ConfigurarDatos(t1,5);
+            Abeja.rand = rand;
+            AlgoritmoAbejas.rand = rand;
+
+            AlgoritmoAbejas ba = new AlgoritmoAbejas(50, 100, 5, 50);
+            prom += ba.Asignacion().fitness;
+          }
+          prom /= iter;
+          Console.WriteLine("Promedio de Soluciones: {0}", prom);
+
+
         }
     }
 }

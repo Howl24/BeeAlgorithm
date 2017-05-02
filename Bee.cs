@@ -16,20 +16,25 @@ namespace TestAlgoritmo
     public static int[] ordenes;// [puestos]
     public static double[, ] tareas; //[empleados, puestos]
     public static double[, ] costo_asignacion; // [empleados, puestos]
-    public static double coeficiente_penalidad = 0.9;
+    public static double coeficiente_penalidad = 1;
+    public static double tam_cadena_reemplazos;
 
     public List<List<int>> empleados_asignados; // [puestos, empleados]
     public double fitness;
-    public static Random rand = new Random();
+    public static Random rand;
 
     public Abeja(){
+    }
+    public Abeja(Abeja abeja){
+      this.AsignarSolucion(abeja.empleados_asignados);
+      this.CalcularFitness();
     }
 
     public static double[, ] CalcularCostos(double[, ] tareas, double[, ] roturas){
       double[, ] costos = new double[num_empleados, num_puestos];
       for (int i=0;i<num_empleados;i++){
         for (int j=0;j<num_puestos;j++){
-          costos[i, j] = (1+roturas[i, j]);
+          costos[i, j] = (1+roturas[i, j])/(1+tareas[i, j]);
         }
       }
       return costos;
@@ -47,12 +52,13 @@ namespace TestAlgoritmo
     }
 
 
-    public static void ConfigurarDatos(Test test){
+    public static void ConfigurarDatos(Test test, int tam_cadena_reemplazos){
       Abeja.num_puestos = test.num_puestos;
       Abeja.num_empleados = test.num_empleados;
       Abeja.ordenes = test.ordenesxpuesto;
       Abeja.tareas = test.tareas; // Tareas realizadas por un empleado en un puesto [empleado, puesto]
       Abeja.costo_asignacion = CalcularCostos(test.tareas, test.roturas);
+      Abeja.tam_cadena_reemplazos = tam_cadena_reemplazos;
     }
 
     //Suceptible a Pedido, revisar test
@@ -255,6 +261,23 @@ namespace TestAlgoritmo
         }
       }
 
+      vecino.CadenaDeReemplazos(puesto);
+
+      //int p1 = vecino.Reemplazo(puesto);
+      //if (p1 != -1){
+      //  int p2 = vecino.Reemplazo(p1);
+      //  if (p2 != -1){
+      //    int p3 = vecino.Reemplazo(p2);
+      //    if (p3 != -1){
+      //      int p4 = vecino.Reemplazo(p3);
+      //      if (p4 != -1){
+      //        int p4 = vecino.Reemplazo(p4);
+      //      }
+      //    }
+      //  }
+      //}
+
+
       vecino.empleados_asignados[puesto_escogido].Add(empleado);
       vecino.CalcularFitness();
       return vecino;
@@ -267,6 +290,115 @@ namespace TestAlgoritmo
         this.fitness = vecino.fitness;
       }
     }
+
+    public void CompararConVecindario(bool doble_shift ){
+      List<int> visitados = new List<int>();
+
+      for (int i=0;i<empleados_asignados.Count;i++){
+        for (int j=0;j<empleados_asignados[i].Count;j++){
+          int empleado = empleados_asignados[i][j];
+          if (!(visitados.Contains(empleado))){
+            visitados.Add(empleado);
+            Abeja vecino = Vecino(i, empleado, doble_shift);
+            if (vecino.fitness < this.fitness){
+              this.AsignarSolucion(vecino.empleados_asignados);
+              this.fitness = vecino.fitness;
+            }
+          }
+        }
+      }
+
+    }
+
+    public Abeja Vecino(int puesto, int empleado, bool doble_shift){
+      Abeja vecino = new Abeja();
+      vecino.AsignarSolucion(empleados_asignados);
+
+      vecino.empleados_asignados[puesto].Remove(empleado);
+      int puesto_escogido = puesto;
+      double min_costo = 100000;
+      for (int nuevo_puesto=0;nuevo_puesto<vecino.empleados_asignados.Count;nuevo_puesto++){
+        if (nuevo_puesto!=puesto){
+          double nuevo_costo = costo_asignacion[empleado, nuevo_puesto];
+
+          double penalidad = 0;
+          double sum_tareas = 0;
+          for (int i=0;i<vecino.empleados_asignados[nuevo_puesto].Count;i++){
+            int emp = vecino.empleados_asignados[nuevo_puesto][i];
+            sum_tareas += tareas[emp, nuevo_puesto];
+          }
+          sum_tareas += tareas[empleado, nuevo_puesto];
+          penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
+          penalidad *= coeficiente_penalidad;
+          nuevo_costo += penalidad;
+
+          if (min_costo > nuevo_costo){
+            min_costo = nuevo_costo;
+            puesto_escogido = nuevo_puesto;
+          }
+        }
+      }
+
+      vecino.empleados_asignados[puesto_escogido].Add(empleado);
+      vecino.CalcularFitness();
+      return vecino;
+
+    }
+
+    public int Reemplazo(int puesto){
+
+      double falta_puesto = ordenes[puesto] - CantidadAsignada(puesto);
+      if (falta_puesto > 0){
+
+        double min_costo = 1000;
+        int nuevo_emp = -1;
+        int puesto_nuevo_emp = -1;
+
+        for (int i=0;i<empleados_asignados.Count;i++){
+          if (i!= puesto){
+            if (CantidadAsignada(i) > ordenes[i]){
+              for (int j=0;j<empleados_asignados[i].Count;j++){
+                int emp = empleados_asignados[i][j];
+                double costo = falta_puesto - tareas[emp, puesto] + costo_asignacion[emp, puesto];
+                if (min_costo > costo){
+                  min_costo = costo;
+                  nuevo_emp = emp;
+                  puesto_nuevo_emp = i;
+                }
+              }
+            }
+          }
+        }
+
+        empleados_asignados[puesto_nuevo_emp].Remove(nuevo_emp);
+        empleados_asignados[puesto].Add(nuevo_emp);
+        return puesto_nuevo_emp;
+
+      }
+      return -1;
+    }
+
+    public double CantidadAsignada(int puesto){
+      double suma = 0;
+      for (int i=0;i<empleados_asignados[puesto].Count;i++){
+        int emp = empleados_asignados[puesto][i];
+        suma += tareas[emp, puesto];
+      }
+      return suma;
+    }
+
+    public void CadenaDeReemplazos(int puesto){
+      int puesto_modificado = puesto;
+      for (int i=0;i<tam_cadena_reemplazos;i++){
+        if (puesto_modificado != -1){
+          puesto_modificado = Reemplazo(puesto_modificado);
+        }else{
+          break;
+        }
+      }
+    }
+
+
 
   }
 }
