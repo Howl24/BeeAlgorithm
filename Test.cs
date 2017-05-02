@@ -55,6 +55,7 @@ namespace TestAlgoritmo
 
             ordenesxpuesto = LeerArreglo(sr, num_puestos);
             tareas = LeerMatriz(sr, num_empleados, num_puestos);
+            sr.ReadLine();
             roturas = LeerMatriz(sr, num_empleados, num_puestos);
 
         }
