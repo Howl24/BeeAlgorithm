@@ -43,19 +43,19 @@ namespace TestAlgoritmo{
         double max = 0;
         double min = 10000;
         for (int i=0;i<abejas_ocupadas.Count;i++){
-          max = Math.Max(max, abejas_ocupadas[i].fitness);
-          min = Math.Min(min, abejas_ocupadas[i].fitness);
+          max = Math.Max(max, 1/abejas_ocupadas[i].fitness);
+          min = Math.Min(min, 1/abejas_ocupadas[i].fitness);
         }
 
         double total = 0;
         for (int i=0;i<abejas_ocupadas.Count;i++){
           double fitness = abejas_ocupadas[i].fitness;
-          total += 1/(1+(fitness-min)/(max-min));
+          total += (1/fitness - min)/(max-min);
         }
 
         for (int i=0;i<abejas_ocupadas.Count;i++){
           double fitness = abejas_ocupadas[i].fitness;
-          prob_espera[i] = 1/(1+(fitness-min)/(max-min))/total;
+          prob_espera[i] = ((1/fitness - min)/(max-min))/total;
           //Console.WriteLine("Fitness: {0}, Prob: {1}", fitness, prob_espera[i]);
         }
         return prob_espera;
@@ -66,10 +66,9 @@ namespace TestAlgoritmo{
         int[] cnt_espera = new int[abejas_ocupadas.Count];
 
         for (int i=0;i<abejas_ocupadas.Count;i++){
+          prob_espera[i] = 1;
           cnt_espera[i] = (int)(num_abejas_espera*prob_espera[i]);
-
         }
-
 
         for (int i=0;i<abejas_ocupadas.Count;i++){
           Console.WriteLine(abejas_ocupadas[i].fitness);
@@ -114,10 +113,10 @@ namespace TestAlgoritmo{
         int k=0;
         for (int i=0;i<num_abejas_explo;i++){
           Abeja exploradora = new Abeja();
-          exploradora.AsignacionSuperRandom();
+          exploradora.AsignacionRandom();
           exploradora.CalcularFitness();
-          exploradora.CompararConVecindario(false);
-          exploradora.CompararConVecindario(true);
+          exploradora.CompararConVecindario(0);
+          exploradora.CompararConVecindario(1);
 
           Abeja ocupada = abejas_ocupadas[lista_negra[k]];
           if (exploradora.fitness < ocupada.fitness){
@@ -137,9 +136,8 @@ namespace TestAlgoritmo{
           //Console.WriteLine("Iteracion {0}:", i+1);
           for (int j=0;j<abejas_ocupadas.Count;j++){
             //Console.WriteLine("Fit {0}:", abejas_ocupadas[j].fitness);
-            abejas_ocupadas[j].CompararConVecindario(false);
-            abejas_ocupadas[j].CompararConVecindario(true);
-
+            abejas_ocupadas[j].CompararConVecindario(0);
+            abejas_ocupadas[j].CompararConVecindario(1);
           }
 
           Dictionary<int, double> prob_espera = CalcularProbabilidadesEspera();

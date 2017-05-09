@@ -18,30 +18,10 @@ namespace TestAlgoritmo
                 Abeja.rand = rand;
                 AlgoritmoAbejas.rand = rand;
 
-                AlgoritmoAbejas ba = new AlgoritmoAbejas(50, 500, 5, 30);
+                AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 10, 1, 30);
                 ba.Asignacion();
                 return ;
             }
-
-          double prom = 0;
-          int iter = 20;
-          for (int i=0;i<iter;i++){
-            Console.WriteLine("Test: {0}", i);
-            Test t1 = new Test();
-            t1.LeerDatos("CR100T10P.txt");
-
-            Random rand = new Random();
-
-            Abeja.ConfigurarDatos(t1,5);
-            Abeja.rand = rand;
-            AlgoritmoAbejas.rand = rand;
-
-            AlgoritmoAbejas ba = new AlgoritmoAbejas(50, 100, 5, 20);
-            prom += ba.Asignacion().fitness;
-          }
-          prom /= iter;
-          Console.WriteLine("Promedio de Soluciones: {0}", prom);
-
         }
     }
 }
