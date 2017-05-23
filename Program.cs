@@ -8,19 +8,22 @@ namespace TestAlgoritmo
         public static void Main(string [] args)
         {
             if (args.Length == 1){
+                //Lectura de archivo
                 string filename = args[0];
                 Test t1 = new Test();
                 t1.LeerDatos(filename);
 
+                //Inicializar datos
                 Random rand = new Random();
-
                 Abeja.ConfigurarDatos(t1,5);
                 Abeja.rand = rand;
                 AlgoritmoAbejas.rand = rand;
 
-                AlgoritmoAbejas ba = new AlgoritmoAbejas(1, 10, 1, 30);
+                //Iniciar algoritmo
+                AlgoritmoAbejas ba = new AlgoritmoAbejas(50, 10, 5, 30);
                 ba.Asignacion();
-                return ;
+            }else{
+              Console.WriteLine("Debe ingresar un archivo");
             }
         }
     }

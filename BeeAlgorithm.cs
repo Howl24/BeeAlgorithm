@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 namespace TestAlgoritmo{
-
   class AlgoritmoAbejas{
 
       public static Random rand;
@@ -20,21 +19,33 @@ namespace TestAlgoritmo{
 
           this.num_abejas_ocupadas = num_abejas_ocupadas;
           this.num_abejas_espera = num_abejas_espera;
-          this.num_abejas_explo = num_abejas_explo; this.max_iteraciones = max_iteraciones;
+          this.num_abejas_explo = num_abejas_explo;
+          this.max_iteraciones = max_iteraciones;
+          this.abejas_ocupadas = new List<Abeja>();
       }
 
       public void InicializarAbejasOcupadas(){
-        abejas_ocupadas = new List<Abeja>();
+
+        double min = 10000;
+        double max = 0;
+        double mid = 0;
 
         for (int i=0;i<num_abejas_ocupadas;i++){
           Abeja abeja = new Abeja();
-          abeja.AsignacionSuperRandom();
+          abeja.AsignacionRandom();
           abeja.CalcularFitness();
-          //Console.WriteLine(abeja.fitness);
-          //abeja.ImprimirSolucion();
 
+          // Inicio Pruebas para corregir GRAH
+          Console.WriteLine("GRAH: {0}", abeja.fitness);
+          min = Math.Min(min, abeja.fitness);
+          max = Math.Max(max, abeja.fitness);
+          mid += abeja.fitness;
+
+          // Fin pruebas
+          
           abejas_ocupadas.Add(abeja);
         }
+        Console.WriteLine("Max: {0} Min: {1} Mid: {2}", max, min, mid/num_abejas_ocupadas);
 
       }
 
@@ -131,6 +142,8 @@ namespace TestAlgoritmo{
       public Abeja Asignacion(){
         InicializarAbejasOcupadas();
         Abeja mejor_abeja = new Abeja();
+
+        return mejor_abeja;
 
         for (int i=0;i<max_iteraciones;i++){
           //Console.WriteLine("Iteracion {0}:", i+1);

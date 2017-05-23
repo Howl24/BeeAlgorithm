@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 //Falta divisiones entre 0
 
 namespace TestAlgoritmo
@@ -56,7 +57,9 @@ namespace TestAlgoritmo
       Abeja.num_puestos = test.num_puestos;
       Abeja.num_empleados = test.num_empleados;
       Abeja.ordenes = test.ordenesxpuesto;
-      Abeja.tareas = test.tareas; // Tareas realizadas por un empleado en un puesto [empleado, puesto]
+
+      // Tareas realizadas por un empleado en un puesto [empleado, puesto]
+      Abeja.tareas = test.tareas; 
       Abeja.costo_asignacion = CalcularCostos(test.tareas, test.roturas);
       Abeja.tam_cadena_reemplazos = tam_cadena_reemplazos;
     }
@@ -64,7 +67,19 @@ namespace TestAlgoritmo
     //Suceptible a Pedido, revisar test
     public double RelacionTareaOrden(int empleado, int puesto){
 
-      double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
+      double sum_tareas = 0;
+      for (int i=0;i<empleados_asignados[puesto].Count;i++){
+        sum_tareas += tareas[empleado,puesto];
+      }
+      double falta = Math.Max(0, ordenes[puesto] - sum_tareas)/(ordenes[puesto]);
+      //Console.WriteLine("Falta {0}", falta);
+
+      //double relacion = falta/costo_asignacion[empleado, puesto];
+      double potencia = 1.5/(1.5-falta);
+      double relacion = 1/Math.Pow(costo_asignacion[empleado, puesto],potencia);
+      Console.WriteLine("Pot: {0:N2}, Rel: {1:N2}", potencia, relacion );
+      //relacion = 1/Math.Pow(costo_asignacion[empleado, puesto],2);
+      //double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
       return relacion;
     }
 
@@ -94,8 +109,11 @@ namespace TestAlgoritmo
       for (int i=0;i<posibles_puestos.Count;i++){
         int puesto = posibles_puestos[i];
         prob_asignacion[puesto] = RelacionTareaOrden(empleado, puesto)/total;
+        //Console.WriteLine("costo: {0}", prob_asignacion[puesto]*total);
+        //Console.WriteLine(prob_asignacion[puesto]);
       }
 
+      //Console.WriteLine();
       return prob_asignacion;
     }
 
@@ -131,9 +149,14 @@ namespace TestAlgoritmo
         }
       }
 
+      List<int> emp_no_asignados = new List<int>();
+      for (int i=0;i<num_empleados;i++){
+        emp_no_asignados.Add(i);
+      }
 
       //GRAH
-      for (int empleado=0;;){
+      for (int i=0; i<num_empleados;i++){
+        int empleado = emp_no_asignados[rand.Next(0,emp_no_asignados.Count)];
         Dictionary<int, double> prob_asignacion = CalcularProbabilidadesAsignacion(empleado, posibles_puestos[empleado]);
 
         double rnd = rand.NextDouble();
@@ -149,12 +172,8 @@ namespace TestAlgoritmo
         }
 
         empleados_asignados[puesto_escogido].Add(empleado);
+        emp_no_asignados.Remove(empleado);
 
-        empleado++;
-        if (empleado<num_empleados){
-        }else{
-          break;
-        }
       }
     }
 
@@ -203,8 +222,9 @@ namespace TestAlgoritmo
         }
 
         penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
-        penalidad *= coeficiente_penalidad;
       }
+
+      penalidad *= coeficiente_penalidad;
       fitness += penalidad;
 
       return fitness;
@@ -329,7 +349,7 @@ namespace TestAlgoritmo
           }
         }
 
-        Console.WriteLine("Puesto Asignado: {0}", puesto_escogido);
+        //Console.WriteLine("Puesto Asignado: {0}", puesto_escogido);
         trial.AsignarSolucion(referencia.empleados_asignados);
         trial.empleados_asignados[puesto_escogido].Add(empleado);
         trial.CalcularFitness();
