@@ -65,40 +65,189 @@ namespace TestAlgoritmo
     public double RelacionTareaOrden(int empleado, int puesto){
 
       double relacion = (double)tareas[empleado, puesto]/(double)ordenes[puesto];
+      //double relacion = 1/costo_asignacion[empleado, puesto];
       return relacion;
     }
 
     public Dictionary<int, double> CalcularProbabilidadesAsignacion(int empleado, List<int> posibles_puestos){
-      /*
-       * La probabilidad se calcula mediante la formula
-       * pij = (bij/ai)/Sum(bij/ai)
-       * donde bij/ai es una relacion tarea-orden
-       * esto significa que porcentaje de la orden se puede
-       * realizar si se asigna al empleado i al puesto j
-       *
-       * La idea del GRAH es darle una mayor probabilidad
-       * de asignacion al empleado que tenga un mayor porcentaje.
-       * Esto debido a que indica un mayor acercamiento a cumplir
-       * la orden pedida.
-       *
-       */
-      
+
+      //Console.WriteLine("Empleado {0}", empleado);
       Dictionary<int, double> prob_asignacion = new Dictionary<int, double>();
+
+      double max = 0;
+      double min = 100000;
+      for (int i=0;i<posibles_puestos.Count;i++){
+        int puesto = posibles_puestos[i];
+        max = Math.Max(max, RelacionTareaOrden(empleado, puesto));
+        min = Math.Min(min, RelacionTareaOrden(empleado, puesto));
+      }
 
       double total = 0;
       for (int i=0;i<posibles_puestos.Count;i++){
         int puesto = posibles_puestos[i];
-        total += RelacionTareaOrden(empleado, puesto); 
+        total += (RelacionTareaOrden(empleado, puesto));
       }
 
       for (int i=0;i<posibles_puestos.Count;i++){
         int puesto = posibles_puestos[i];
         prob_asignacion[puesto] = RelacionTareaOrden(empleado, puesto)/total;
+        //Console.WriteLine("{0} {1}", RelacionTareaOrden(empleado, puesto), prob_asignacion[puesto]);
       }
+      //Console.WriteLine();
 
       return prob_asignacion;
     }
 
+    public void AsignacionMegaRandom(){
+      empleados_asignados = new List<List<int>>();
+      for (int i=0;i<num_puestos;i++){
+        empleados_asignados.Add(new List<int>());
+      }
+
+      List<int> no_visitados = new List<int>();
+      for (int i=0;i<num_empleados;i++){
+        no_visitados.Add(i);
+      }
+
+      for (int puesto=0;puesto<num_puestos;puesto++){
+        if (puesto == 1) continue;
+        double sum = 0;
+        int cnt = 0;
+        while(sum < ordenes[puesto]){
+          double max = 0;
+          int esc = 0;
+          for (int i=0;i<no_visitados.Count;i++){
+            int emp = no_visitados[i];
+            if (max < tareas[emp, puesto]){
+              max = tareas[emp, puesto];
+              esc = emp;
+            }
+          }
+          sum += max;
+          cnt++;
+          empleados_asignados[puesto].Add(esc);
+          no_visitados.Remove(esc);
+        }
+        Console.WriteLine(cnt);
+      }
+
+      for (int i=0;i<no_visitados.Count;i++){
+        int emp = no_visitados[i];
+        empleados_asignados[1].Add(emp);
+      }
+
+
+      //int j = 0;
+      //for (;j<38;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 0]){
+      //      min = costo_asignacion[emp, 0];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[0].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //for (;j<77;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 2]){
+      //      min = costo_asignacion[emp, 2];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[2].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //for (;j<117;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 3]){
+      //      min = costo_asignacion[emp, 3];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[3].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //for (;j<135;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 4]){
+      //      min = costo_asignacion[emp, 4];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[4].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //for (;j<155;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 5]){
+      //      min = costo_asignacion[emp, 5];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[5].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //for (;j<400;j++){
+      //  int min = 10000;
+      //  int esc = 0;
+      //  for (int i=0;i<no_visitados.Count;i++){
+      //    int emp = no_visitados[i];
+      //    if (min > costo_asignacion[emp, 1]){
+      //      min = costo_asignacion[emp, 1];
+      //      esc = emp;
+      //    }
+      //  }
+      //  empleados_asignados[1].Add(esc);
+      //  no_visitados.Remove(esc);
+      //}
+
+      //38
+
+      ////39
+      //for (;j<77;j++){
+      //  empleados_asignados[2].Add(j);
+      //}
+
+      ////40
+      //for (;j<117;j++){
+      //  empleados_asignados[3].Add(j);
+      //}
+
+      ////18
+      //for (;j<135;j++){
+      //  empleados_asignados[4].Add(j);
+      //}
+
+      ////20
+      //for (;j<155;j++){
+      //  empleados_asignados[5].Add(j);
+      //}
+
+      //for (;j<400;j++){
+      //  empleados_asignados[1].Add(j);
+      //}
+    }
 
     public void AsignacionSuperRandom(){
       empleados_asignados = new List<List<int>>();
@@ -116,13 +265,16 @@ namespace TestAlgoritmo
     public void AsignacionRandom(){
       empleados_asignados = new List<List<int>>();
       List<List<int>> posibles_puestos = new List<List<int>>();
+      List<int> no_visitados = new List<int>();
 
       for (int i=0;i<num_puestos;i++){
         empleados_asignados.Add(new List<int>());
       }
 
-      //Initialize possible agents per task
-      //All agents can be chosen at the beginning
+      for (int i=0;i<num_empleados;i++){
+        no_visitados.Add(i);
+      }
+
       for (int empleado=0;empleado<num_empleados;empleado++){
         posibles_puestos.Add(new List<int>());
 
@@ -131,14 +283,14 @@ namespace TestAlgoritmo
         }
       }
 
-
-      //GRAH
-      for (int empleado=0;;){
+      while( no_visitados.Count != 0 ){
+        int rnd_idx = rand.Next(0, no_visitados.Count);
+        int empleado = no_visitados[rnd_idx];
         Dictionary<int, double> prob_asignacion = CalcularProbabilidadesAsignacion(empleado, posibles_puestos[empleado]);
 
         double rnd = rand.NextDouble();
         double cur_sum = 0;
-        int puesto_escogido = 0;
+        int puesto_escogido = 1;
         for (int j=0;j<posibles_puestos[empleado].Count;j++){
           int puesto = posibles_puestos[empleado][j];
           cur_sum += prob_asignacion[puesto];
@@ -149,17 +301,23 @@ namespace TestAlgoritmo
         }
 
         empleados_asignados[puesto_escogido].Add(empleado);
+        no_visitados.Remove(empleado);
 
-        empleado++;
-        if (empleado<num_empleados){
-        }else{
-          break;
+        double total_asignado = 0;
+        for (int i=0;i<empleados_asignados[puesto_escogido].Count;i++){
+          int emp = empleados_asignados[puesto_escogido][i];
+          total_asignado += tareas[emp, puesto_escogido];
+        }
+
+        if (total_asignado > ordenes[puesto_escogido] ){
+          for (int i=0;i<posibles_puestos.Count;i++){
+            posibles_puestos[i].Remove(puesto_escogido);
+          }
         }
       }
     }
 
     public void ImprimirSolucion(){
-
       for (int i=0;i<empleados_asignados.Count;i++){
         double sum_tareas = 0;
         for (int j=0;j<empleados_asignados[i].Count;j++){
@@ -183,6 +341,21 @@ namespace TestAlgoritmo
       fitness = Fitness(empleados_asignados);
     }
 
+    public double Penalidad(){
+      double penalidad = 0;
+      for (int puesto=0;puesto<empleados_asignados.Count;puesto++){
+        double sum_tareas = 0;
+        for (int j=0;j<empleados_asignados[puesto].Count;j++){
+          int empleado = empleados_asignados[puesto][j];
+          sum_tareas += tareas[empleado, puesto];
+        }
+
+        penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
+      }
+      penalidad *= coeficiente_penalidad;
+      return penalidad;
+    }
+
     public double Fitness(List<List<int>> empleados_asignados){
       double fitness = 0;
 
@@ -202,8 +375,8 @@ namespace TestAlgoritmo
         }
 
         penalidad += Math.Max(0, ordenes[puesto] - sum_tareas);
-        penalidad *= coeficiente_penalidad;
       }
+      penalidad *= coeficiente_penalidad;
       fitness += penalidad;
 
       return fitness;
@@ -385,6 +558,7 @@ namespace TestAlgoritmo
         }
       }
     }
+
 
   }
 }
